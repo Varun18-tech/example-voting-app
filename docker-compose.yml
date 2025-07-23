@@ -94,3 +94,9 @@ volumes:
 networks:
   front-tier:
   back-tier:
+
+tests:
+    build: ./tests
+    depends_on:
+      - vote
+      - result
