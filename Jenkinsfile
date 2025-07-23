@@ -8,23 +8,31 @@ pipeline {
         }
         stage('Build All Services') {
             steps {
-                sh 'docker-compose build'
+                // Changed to 'docker compose'
+                sh 'docker compose build'
             }
         }
         stage('Test Application') {
             steps {
                 echo 'Deploying services temporarily to run tests...'
-                sh 'docker-compose up -d'
-                sh 'docker-compose run --rm tests'
+                // Changed to 'docker compose'
+                sh 'docker compose up -d'
+
+                echo 'Running health check tests...'
+                // Changed to 'docker compose'
+                sh 'docker compose run --rm tests'
+
                 // Clean up the temporary test environment
-                sh 'docker-compose down' 
+                // Changed to 'docker compose'
+                sh 'docker compose down' 
             }
         }
         stage('Deploy Final Application') {
             steps {
                 echo 'Tests passed! Deploying the final application stack...'
                 // This command now starts the services and leaves them running
-                sh 'docker-compose up -d'
+                // Changed to 'docker compose'
+                sh 'docker compose up -d'
             }
         }
     }
