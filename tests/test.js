@@ -2,7 +2,7 @@ const axios = require('axios');
 const assert = require('assert');
 
 // URLs for the services. The result app serves its API at the /results endpoint.
-const vote_url = 'http://vote:80';
+const vote_url = 'http://vote:80/';
 const result_url = 'http://result:80/results';
 
 // A helper function to introduce a delay, giving the worker time to process.
