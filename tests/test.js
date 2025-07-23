@@ -28,11 +28,9 @@ describe('Voting App E2E Tests', function() {
     const initialResultResponse = await axios.get(result_url);
     const initialVotes = parseInt(initialResultResponse.data.a) || 0;
 
-    // Cast a new vote for option 'a'
-    const voteData = new URLSearchParams();
-    voteData.append('vote', 'a');
+    // THIS IS THE CORRECTED PART: We now send the data as a simple string.
+    const voteData = 'vote=a';
 
-    // THIS IS THE CORRECTED PART: We now explicitly set the Content-Type header
     await axios.post(vote_url, voteData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
