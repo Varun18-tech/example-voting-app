@@ -11,31 +11,27 @@ pipeline {
                 sh 'docker-compose build'
             }
         }
-        // This is the new stage that runs your tests
         stage('Test Application') {
             steps {
                 echo 'Deploying services temporarily to run tests...'
-                // Start all services in the background so they can be tested
                 sh 'docker-compose up -d'
-
-                echo 'Running health check tests...'
-                // Run the 'tests' service. If any tests fail, it will stop the pipeline.
                 sh 'docker-compose run --rm tests'
+                // Clean up the temporary test environment
+                sh 'docker-compose down' 
             }
         }
-        stage('Deploy Application Stack') {
+        stage('Deploy Final Application') {
             steps {
-                echo 'Tests passed! Redeploying the final stack...'
-                // We run 'up -d' again to ensure everything is running fresh after the tests.
+                echo 'Tests passed! Deploying the final application stack...'
+                // This command now starts the services and leaves them running
                 sh 'docker-compose up -d'
             }
         }
     }
     post {
+        // The post section no longer stops the containers
         always {
-            echo 'Pipeline finished. Tearing down the environment...'
-            // This command will always run to stop and remove containers after the build.
-            sh 'docker-compose down' 
+            echo 'Pipeline finished.'
             sh 'docker image prune -f'
         }
     }
