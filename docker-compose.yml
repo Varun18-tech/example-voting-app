@@ -94,6 +94,9 @@ services:
     depends_on:
       - vote
       - result
+    networks:
+      - front-tier
+      - back-tier
 
 volumes:
   db-data:
