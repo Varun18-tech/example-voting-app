@@ -1,38 +1,42 @@
-// Jenkinsfile for a Docker Compose application
 pipeline {
     agent any
-
     stages {
         stage('Checkout Code') {
             steps {
-                echo 'Checking out the Voting App source code...'
                 checkout scm
             }
         }
-
         stage('Build All Services') {
             steps {
-                echo 'Building all application services using Docker Compose...'
-                // This command reads the 'docker-compose.yml' file and builds all the images
                 sh 'docker-compose build'
             }
         }
+        // This is the new stage that runs your tests
+        stage('Test Application') {
+            steps {
+                echo 'Deploying services temporarily to run tests...'
+                // Start all services in the background so they can be tested
+                sh 'docker-compose up -d'
 
+                echo 'Running health check tests...'
+                // Run the 'tests' service. If any tests fail, it will stop the pipeline.
+                sh 'docker-compose run --rm tests'
+            }
+        }
         stage('Deploy Application Stack') {
             steps {
-                echo 'Stopping any old services and deploying the new stack...'
-                // This stops and removes all containers defined in the compose file
-                sh 'docker-compose down'
-                // This creates and starts all containers, networks, and volumes in the background
+                echo 'Tests passed! Redeploying the final stack...'
+                // We run 'up -d' again to ensure everything is running fresh after the tests.
                 sh 'docker-compose up -d'
             }
         }
     }
-
     post {
         always {
-            echo 'Pipeline finished.'
-            sh 'docker image prune -f' // Clean up unused images
+            echo 'Pipeline finished. Tearing down the environment...'
+            // This command will always run to stop and remove containers after the build.
+            sh 'docker-compose down' 
+            sh 'docker image prune -f'
         }
     }
 }
